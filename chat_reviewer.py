@@ -186,7 +186,29 @@ class Reviewer:
         # 打开一个文件，以写入模式
         with open(file_name, mode, encoding="utf-8") as f:
             # 将html格式的内容写入文件
-            f.write(text)                    
+            f.write(text)
+            
+def chat_reviewer_main(args):
+    reviewer1 = Reviewer(args=args)
+    # 开始判断是路径还是文件：   
+    paper_list = []
+    if args.paper_path.endswith(".pdf"):
+        paper_list.append(Paper(path=args.paper_path))
+    else:
+        for root, dirs, files in os.walk(args.paper_path):
+            print("root:", root, "dirs:", dirs, 'files:', files)  # 当前目录路径
+            for filename in files:
+                # 如果找到PDF文件，则将其复制到目标文件夹中
+                if filename.endswith(".pdf"):
+                    paper_list.append(Paper(path=os.path.join(root, filename)))
+    print("------------------paper_num: {}------------------".format(len(paper_list)))
+    [print(paper_index, paper_name.path.split('\\')[-1]) for paper_index, paper_name in enumerate(paper_list)]
+    reviewer1.review_by_chatgpt(paper_list=paper_list)
+
+from collections import namedtuple
+ReviewerParams = namedtuple(
+    "Params", ["paper_path", "file_format", "research_fields", "language"]
+)                    
 
 def main(args):            
 
